@@ -1,10 +1,8 @@
-// Flutter code sample for widgets.Form.1
-
-// This example shows a [Form] with one [TextFormField] and a [RaisedButton]. A
-// [GlobalKey] is used here to identify the [Form] and validate input.
-
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'package:provider/provider.dart';
+import 'package:love_chat/routes/MyRouter.dart';
+import 'package:love_chat/models/user.dart';
+
 void main() => runApp(MyApp());
 
 /// This Widget is the main application widget.
@@ -13,16 +11,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: _title,
-      theme: ThemeData.dark(),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('登录'),
-        ),
-        body: Login(),
+    return MultiProvider(
+      providers: [
+        Provider(builder: (context) => User()),
+      ],
+      child: MaterialApp(
+        title: _title,
+        theme: ThemeData.dark(),
+        initialRoute: '/',
+        routes: MyRouter.routes,
+        onGenerateRoute: MyRouter.getRoute,
       ),
-    ); 
+    );
   }
 }
-
