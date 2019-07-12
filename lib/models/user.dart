@@ -13,9 +13,9 @@ class User {
   User._([Map<String, dynamic> json]) {
     // 具体初始化代码
     if (json != null) {
-      userId = json['userId'];
-      userName = json['userName'];
-      avatar = json['avatar'];
+      _instance.userId = json['userId'];
+      _instance.userName = json['userName'];
+      _instance.avatar = json['avatar'];
     }
   }
 
@@ -29,5 +29,10 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     User._(json);
     return _sharedInstance();
+  }
+
+  @override
+  String toString() {
+    return '{userId:$userId, userName:$userName, avatar:$avatar, accessToken:$accessToken}';
   }
 }

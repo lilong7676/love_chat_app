@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:love_chat/models/user.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   final String title;
@@ -25,7 +27,7 @@ class _LoginState extends State<Login> {
       autofocus: true,
       focusNode: _nameFocusNode,
       decoration: InputDecoration(
-        labelText: widget.title != null ? widget.title : '用户名',
+        labelText: '用户名:',
         hintText: '你爱我吗？',
         prefixIcon: Icon(Icons.person),
       ),
@@ -61,7 +63,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('登录'),
+        title: Text(widget.title ?? '登录'),
       ),
       body: Container(
         child: Form(
@@ -117,6 +119,10 @@ class _LoginState extends State<Login> {
       _nameFocusNode.unfocus();
       _passwordFocusNode.unfocus();
     }
+
+    User user = Provider.of<User>(context);
+
+    print('user ' + user.toString());
 
     if (ModalRoute.of(context).settings.name == '/login2') {
       Navigator.pop(context, 'testPopResult');
