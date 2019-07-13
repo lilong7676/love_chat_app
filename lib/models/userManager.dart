@@ -1,16 +1,19 @@
-class User {
+class UserManager {
   String userId;
   String userName;
   String avatar;
   String accessToken;
 
+  bool hasLogin() {
+    return false;
+  }
+
+  // 单例相关
   // 单例公开访问点
-  factory User() => _sharedInstance();
-
+  factory UserManager() => _sharedInstance();
   // 供内部使用
-  static User _instance;
-
-  User._([Map<String, dynamic> json]) {
+  static UserManager _instance;
+  UserManager._([Map<String, dynamic> json]) {
     // 具体初始化代码
     if (json != null) {
       _instance.userId = json['userId'];
@@ -18,16 +21,15 @@ class User {
       _instance.avatar = json['avatar'];
     }
   }
-
-  static User _sharedInstance() {
+  static UserManager _sharedInstance() {
     if (_instance == null) {
-      _instance = User._();
+      _instance = UserManager._();
     }
     return _instance;
   }
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    User._(json);
+  factory UserManager.fromJson(Map<String, dynamic> json) {
+    UserManager._(json);
     return _sharedInstance();
   }
 

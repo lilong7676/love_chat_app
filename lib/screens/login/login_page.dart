@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:love_chat/models/user.dart';
+import 'package:love_chat/models/globalSettings.dart';
 import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
@@ -119,10 +119,6 @@ class _LoginState extends State<Login> {
       _nameFocusNode.unfocus();
       _passwordFocusNode.unfocus();
     }
-
-    User user = Provider.of<User>(context);
-
-    print('user ' + user.toString());
 
     if (ModalRoute.of(context).settings.name == '/login2') {
       Navigator.pop(context, 'testPopResult');
