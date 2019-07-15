@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class GlobalSettings extends ChangeNotifier {
   // 全局主题
-  ThemeData _brightnessTheme = ThemeData.light();
+  ThemeData _brightnessTheme = ThemeData.dark();
 
 
   set brightnessTheme(ThemeData brightnessTheme) {

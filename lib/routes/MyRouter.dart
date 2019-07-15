@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:love_chat/screens/login/login_page.dart';
+import 'package:love_chat/screens/login/register_page.dart';
 
 class MyRouter {
   static final routes = <String, WidgetBuilder>{
     '/': (BuildContext context) => Login(),
+    '/register': (BuildContext context) => RegisterPage(),
   };
 
   static Route<dynamic> getRoute(RouteSettings settings) {

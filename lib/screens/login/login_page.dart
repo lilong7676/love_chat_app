@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:love_chat/models/globalSettings.dart';
+import 'package:love_chat/providers/globalSettings.dart';
+import 'package:love_chat/providers/userManager.dart';
 import 'package:provider/provider.dart';
+import 'package:love_chat/net/net_utils.dart';
+import 'package:dio/dio.dart';
 
 class Login extends StatefulWidget {
   final String title;
@@ -19,7 +25,7 @@ class _LoginState extends State<Login> {
 
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
-
+  TapGestureRecognizer _registerTapGesture;
   @override
   void initState() {
     _userNameField = TextFormField(
@@ -56,11 +62,13 @@ class _LoginState extends State<Login> {
       },
     );
 
+    _registerTapGesture = TapGestureRecognizer()..onTap = registerAction;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    print('build');
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title ?? '登录'),
@@ -85,48 +93,82 @@ class _LoginState extends State<Login> {
               _userNameField,
               _passwordField,
               Padding(
-                  padding: EdgeInsets.only(top: 100),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      RaisedButton(
-                        onPressed: () {
-                          _formKey.currentState.validate();
-                          loginAction();
-                        },
-                        child: Text('注册'),
-                      ),
-                      RaisedButton(
-                        onPressed: () {
-                          _formKey.currentState.validate();
-                          loginAction();
-                        },
-                        child: Text('登录'),
-                      ),
-                    ],
+                  padding: EdgeInsets.only(top: 50),
+                  child: RichText(
+                    text: TextSpan(
+                      text: '还没有注册？',
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: '现在注册',
+                          style: TextStyle(color: Colors.pink),
+                          recognizer: _registerTapGesture,
+                        ),
+                      ],
+                    ),
                   ))
             ],
           ),
         ),
         margin: EdgeInsets.fromLTRB(15, 20, 15, 20),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          loginAction();
+        },
+        child: Icon(Icons.arrow_forward),
+        backgroundColor: Colors.pink,
+      ),
     );
   }
 
   void loginAction() {
-    if (_nameController.text.isNotEmpty &&
-        _passwordController.text.isNotEmpty) {
-      _nameFocusNode.unfocus();
-      _passwordFocusNode.unfocus();
+    if (!_formKey.currentState.validate()) {
+      return;
     }
 
-    if (ModalRoute.of(context).settings.name == '/login2') {
-      Navigator.pop(context, 'testPopResult');
-    } else {
-      Navigator.pushNamed(context, '/login2', arguments: {'a': 1, 'b': 2})
-          .then((result) {
-        print('push Result $result');
-      });
-    }
+    Map<String, String> params = {
+      'username': _nameController.text,
+      'password': _passwordController.text,
+      'client_id': '1_6at33278mzs4o8oo84cco0c0gs8kc0ss0co4ww8ks0k48gc0oc',
+      'client_secret': '60qx1xjm7f4sog04gg4sw48kkwcw40wgoooowossgsw84c00ww',
+      'grant_type': 'password'
+    };
+
+    Dio dio = Dio();
+    dio.options.contentType =
+        ContentType.parse("application/x-www-form-urlencoded");
+
+    dio.post('$baseUrl/oauth/token', data: params).then((result) {
+      print(result);
+      Map<String, dynamic> res = result.data as Map;
+      if (res['code'] as int == 200) {
+        String accessToken = res['data']['accessToken'] as String;
+        UserManager().accessToken = accessToken;
+        print(UserManager());
+      }
+    }).catchError((error) {
+      print(error);
+    });
+
+    // GlobalSettings globalSettings = Provider.of<GlobalSettings>(context);
+    // globalSettings.brightnessTheme = globalSettings.brightnessTheme == ThemeData.dark() ? ThemeData.light() : ThemeData.dark();
+
+    // if (ModalRoute.of(context).settings.name == '/login2') {
+    //   Navigator.pop(context, 'testPopResult');
+    // } else {
+    //   Navigator.pushNamed(context, '/login2', arguments: {'a': 1, 'b': 2})
+    //       .then((result) {
+    //     print('push Result $result');
+    //   });
+    // }
+  }
+
+  void unfocus() {
+    _nameFocusNode.unfocus();
+    _passwordFocusNode.unfocus();
+  }
+
+  void registerAction() {
+    Navigator.pushNamed(context, '/register');
   }
 }

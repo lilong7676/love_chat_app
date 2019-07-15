@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:love_chat/routes/MyRouter.dart';
-import 'package:love_chat/models/userManager.dart';
-import 'package:love_chat/models/globalSettings.dart';
+import 'package:love_chat/providers/userManager.dart';
+import 'package:love_chat/providers/globalSettings.dart';
 
 void main() => runApp(MyApp());
 
