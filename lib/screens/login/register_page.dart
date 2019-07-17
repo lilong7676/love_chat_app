@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:love_chat/net/net_utils.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key}) : super(key: key);
@@ -11,10 +12,13 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _secondPasswordController =
       TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(title: Text('注册')),
       body: ListView(
         padding: EdgeInsets.fromLTRB(15, 20, 15, 20),
@@ -32,6 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
           Form(
+            key: _formKey,
             child: Column(
               children: <Widget>[
                 TextFormField(
@@ -47,8 +52,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 TextFormField(
-                  controller: _usernameController,
-                  autofocus: true,
+                  controller: _passwordController,
+                  obscureText: true,
                   validator: (inputValue) {
                     return inputValue.isEmpty ? '请输入密码' : null;
                   },
@@ -59,8 +64,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 TextFormField(
-                  controller: _usernameController,
-                  autofocus: true,
+                  controller: _secondPasswordController,
+                  obscureText: true,
                   validator: (inputValue) {
                     return inputValue.isEmpty ? '再次输入密码' : null;
                   },
@@ -73,12 +78,46 @@ class _RegisterPageState extends State<RegisterPage> {
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 20),
                 ),
-                
               ],
             ),
           )
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: registerAction,
+        child: Icon(Icons.arrow_forward),
+        backgroundColor: Colors.pink,
+      ),
     );
+  }
+
+  void registerAction() {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    String password1 = _passwordController.text;
+    String password2 = _secondPasswordController.text;
+    if (password1 != password2) {
+      showToast('两次密码不一致');
+      return;
+    }
+
+    Map<String, String> params = {
+      'username': _usernameController.text,
+      'password': _passwordController.text,
+    };
+
+    NetUtils().requestNetwork(Method.post, '/users/register', params: params,
+        onSuccess: (result) {
+      showToast('注册成功');
+      Navigator.pop(context);
+    }, onError: (code, msg) {
+      showToast(msg);
+    });
+  }
+
+  void showToast(String text) {
+    _scaffoldKey.currentState.showSnackBar(
+        SnackBar(content: Text(text), duration: Duration(milliseconds: 1500)));
   }
 }

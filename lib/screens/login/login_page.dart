@@ -16,6 +16,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   // 用户名输入框
@@ -70,6 +71,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     print('build');
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(widget.title ?? '登录'),
       ),
@@ -145,8 +147,11 @@ class _LoginState extends State<Login> {
         String accessToken = res['data']['accessToken'] as String;
         UserManager().accessToken = accessToken;
         print(UserManager());
+      } else {
+        showToast(res['message'] as String);
       }
     }).catchError((error) {
+      showToast(error.toString());
       print(error);
     });
 
@@ -170,5 +175,10 @@ class _LoginState extends State<Login> {
 
   void registerAction() {
     Navigator.pushNamed(context, '/register');
+  }
+
+  void showToast(String text) {
+    _scaffoldKey.currentState.showSnackBar(
+        SnackBar(content: Text(text), duration: Duration(milliseconds: 1500)));
   }
 }

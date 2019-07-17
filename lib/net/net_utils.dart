@@ -76,7 +76,7 @@ class NetUtils {
     T _data;
 
     try {
-      Map<String, dynamic> _map = json.decode(response.data.toString());
+      Map<String, dynamic> _map = response.data;
       _code = _map['code'];
       _msg = _map['message'];
       if (_map.containsKey('data')) {
@@ -104,7 +104,7 @@ class NetUtils {
     List<T> _data = [];
 
     try {
-      Map<String, dynamic> _map = json.decode(response.data.toString());
+      Map<String, dynamic> _map = response.data;
       _code = _map['code'];
       _msg = _map['message'];
       if (_map.containsKey('data')) {
