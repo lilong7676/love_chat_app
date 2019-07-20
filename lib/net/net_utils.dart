@@ -145,7 +145,7 @@ class NetUtils {
       if (e is DioError && CancelToken.isCancel(e)) {
         log('取消请求接口： $url');
       }
-      Error error = ExceptionHandle.handleException(e);
+      NetBaseEntity error = ExceptionHandle.handleException(e);
       return Future.value(NetBaseEntity(error.code, error.message, null));
     }
   }
@@ -166,17 +166,14 @@ class NetUtils {
       if (e is DioError && CancelToken.isCancel(e)) {
         log('取消请求接口： $url');
       }
-      Error error = ExceptionHandle.handleException(e);
+      NetBaseEntity error = ExceptionHandle.handleException(e);
       return Future.value(NetBaseEntity(error.code, error.message, []));
     }
   }
 
   /// 统一处理(onSuccess返回T对象，onSuccessList返回List<T>)
-  requestNetwork<T>(Method method, String url,
-      {Function(T t) onSuccess,
-      Function(List<T> list) onSuccessList,
-      Function(int code, String mag) onError,
-      Map<String, dynamic> params,
+  Future requestNetwork<T>(Method method, String url,
+      {Map<String, dynamic> params,
       Map<String, dynamic> queryParameters,
       CancelToken cancelToken,
       Options options,
@@ -195,28 +192,20 @@ class NetUtils {
             options: options,
             cancelToken: cancelToken);
 
-    requestFuture.then((result) {
-      if (result.code == 200) {
-        isList ? onSuccessList(result.data) : onSuccess(result.data);
-      } else {
-        onError == null
-            ? _onError(result.code, result.message)
-            : onError(result.code, result.message);
-      }
+    return requestFuture.then((result) {
+      return result;
     }).catchError((e) {
       if (e is DioError && CancelToken.isCancel(e)) {
         log('取消请求接口: $url');
       }
-      Error error = ExceptionHandle.handleException(e);
-      onError == null
-          ? _onError(error.code, error.message)
-          : onError(error.code, error.message);
+      NetBaseEntity error = ExceptionHandle.handleException(e);
+      _onError(error.code, error.message);
+      throw NetBaseEntity(error.code, error.message, null);
     });
   }
 
-  _onError(int code, String mag) {
-    log('接口请求异常： code: $code, mag: $mag');
-    // Toast.show(mag);
+  _onError(int code, String msg) {
+    log('接口请求异常： code: $code, msg: $msg');
   }
 
   String _getRequestMethod(Method method) {

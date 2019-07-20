@@ -1,12 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:love_chat/providers/globalSettings.dart';
 import 'package:love_chat/providers/userManager.dart';
-import 'package:provider/provider.dart';
-import 'package:love_chat/net/net_utils.dart';
-import 'package:dio/dio.dart';
+import 'package:love_chat/api/api_account.dart';
+import 'package:love_chat/net/net_base_entity.dart';
+import 'package:love_chat/api/api_user.dart';
+import 'package:love_chat/lv/user/user.dart';
 
 class Login extends StatefulWidget {
   final String title;
@@ -69,7 +67,6 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    print('build');
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -123,7 +120,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void loginAction() {
+  void loginAction() async {
     if (!_formKey.currentState.validate()) {
       return;
     }
@@ -131,29 +128,26 @@ class _LoginState extends State<Login> {
     Map<String, String> params = {
       'username': _nameController.text,
       'password': _passwordController.text,
-      'client_id': '1_6at33278mzs4o8oo84cco0c0gs8kc0ss0co4ww8ks0k48gc0oc',
-      'client_secret': '60qx1xjm7f4sog04gg4sw48kkwcw40wgoooowossgsw84c00ww',
-      'grant_type': 'password'
     };
 
-    Dio dio = Dio();
-    dio.options.contentType =
-        ContentType.parse("application/x-www-form-urlencoded");
+    try {
+      Map<String, dynamic> result = await ApiAccount.fetchLogin(params);
 
-    dio.post('$baseUrl/oauth/token', data: params).then((result) {
-      print(result);
-      Map<String, dynamic> res = result.data as Map;
-      if (res['code'] as int == 200) {
-        String accessToken = res['data']['accessToken'] as String;
+      if (result['code'] as int == 200) {
+        String accessToken = result['data']['accessToken'] as String;
         UserManager().accessToken = accessToken;
         print(UserManager());
+        NetBaseEntity<User> profile = await ApiUser.fetchUserProfile();
+        if (profile.code == 200) {
+          
+        }
+
       } else {
-        showToast(res['message'] as String);
+        showToast(result['message'] as String);
       }
-    }).catchError((error) {
-      showToast(error.toString());
-      print(error);
-    });
+    } catch (e) {
+      showToast(e.toString());
+    }
 
     // GlobalSettings globalSettings = Provider.of<GlobalSettings>(context);
     // globalSettings.brightnessTheme = globalSettings.brightnessTheme == ThemeData.dark() ? ThemeData.light() : ThemeData.dark();

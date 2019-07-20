@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:love_chat/net/net_utils.dart';
+import 'package:love_chat/api/api_account.dart';
+import 'package:love_chat/net/net_base_entity.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key}) : super(key: key);
@@ -91,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  void registerAction() {
+  void registerAction() async {
     if (!_formKey.currentState.validate()) {
       return;
     }
@@ -106,14 +107,16 @@ class _RegisterPageState extends State<RegisterPage> {
       'username': _usernameController.text,
       'password': _passwordController.text,
     };
-
-    NetUtils().requestNetwork(Method.post, '/users/register', params: params,
-        onSuccess: (result) {
-      showToast('注册成功');
-      Navigator.pop(context);
-    }, onError: (code, msg) {
-      showToast(msg);
-    });
+    try {
+      NetBaseEntity result = await ApiAccount.fetchRegister(params);
+      if (result.code == 200) {
+        Navigator.pop(context);
+      } else {
+        showToast(result.message);
+      }
+    } catch (e) {
+      showToast('网络错误');
+    }
   }
 
   void showToast(String text) {
