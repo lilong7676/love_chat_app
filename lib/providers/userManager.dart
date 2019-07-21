@@ -1,11 +1,14 @@
-class UserManager {
-  String userId;
-  String userName;
-  String avatar;
-  String accessToken;
+import 'package:love_chat/lv/user/user.dart';
 
-  bool hasLogin() {
-    return false;
+class UserManager {
+  User _user;
+  String accessToken;
+  int get userId => _user?.userId;
+  String get userName => _user?.userName;
+  String get avatar => _user?.avatar;
+
+  set user(User user) {
+    _user = user;
   }
 
   // 单例相关
@@ -13,24 +16,15 @@ class UserManager {
   factory UserManager() => _sharedInstance();
   // 供内部使用
   static UserManager _instance;
-  UserManager._([Map<String, dynamic> json]) {
+  // 命名构造函数
+  UserManager._() {
     // 具体初始化代码
-    if (json != null) {
-      _instance.userId = json['userId'];
-      _instance.userName = json['userName'];
-      _instance.avatar = json['avatar'];
-    }
   }
   static UserManager _sharedInstance() {
     if (_instance == null) {
       _instance = UserManager._();
     }
     return _instance;
-  }
-
-  factory UserManager.fromJson(Map<String, dynamic> json) {
-    UserManager._(json);
-    return _sharedInstance();
   }
 
   @override

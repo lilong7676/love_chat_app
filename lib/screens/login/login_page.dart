@@ -22,6 +22,13 @@ class _LoginState extends State<Login> {
   //密码输入框
   TextFormField _passwordField;
 
+  bool _isSaving = false;
+  void showHUD (bool isSaving) {
+    setState(() {
+      _isSaving = isSaving;
+    });
+  }
+
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
   TapGestureRecognizer _registerTapGesture;
@@ -65,6 +72,65 @@ class _LoginState extends State<Login> {
     super.initState();
   }
 
+  List<Widget> _buildForm(BuildContext context) {
+    List list = List<Widget>();
+    var form = Form(
+      key: _formKey,
+      child: ListView(
+        padding: EdgeInsets.all(15),
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 30),
+            child: Text(
+              'LoveChat',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+                color: Colors.pink,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          _userNameField,
+          _passwordField,
+          Padding(
+              padding: EdgeInsets.only(top: 50),
+              child: RichText(
+                text: TextSpan(
+                  text: '还没有注册？',
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '现在注册',
+                      style: TextStyle(color: Colors.pink),
+                      recognizer: _registerTapGesture,
+                    ),
+                  ],
+                ),
+              )),
+        ],
+      ),
+    );
+
+    list.add(form);
+
+    if (_isSaving) {
+      var hud = Stack(
+        children: [
+          new Opacity(
+            opacity: 0.3,
+            child: const ModalBarrier(dismissible: false, color: Colors.grey),
+          ),
+          new Center(
+            child: new CircularProgressIndicator(),
+          ),
+        ],
+      );
+      list.add(hud);
+    }
+
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,43 +138,9 @@ class _LoginState extends State<Login> {
       appBar: AppBar(
         title: Text(widget.title ?? '登录'),
       ),
-      body: Container(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 30),
-                child: Text(
-                  'LoveChat',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30,
-                    color: Colors.pink,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              _userNameField,
-              _passwordField,
-              Padding(
-                  padding: EdgeInsets.only(top: 50),
-                  child: RichText(
-                    text: TextSpan(
-                      text: '还没有注册？',
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: '现在注册',
-                          style: TextStyle(color: Colors.pink),
-                          recognizer: _registerTapGesture,
-                        ),
-                      ],
-                    ),
-                  ))
-            ],
-          ),
-        ),
-        margin: EdgeInsets.fromLTRB(15, 20, 15, 20),
+      body: Stack(
+        children: _buildForm(context),
+        // padding: EdgeInsets.fromLTRB(15, 20, 15, 20),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -125,6 +157,8 @@ class _LoginState extends State<Login> {
       return;
     }
 
+    showHUD(true);
+
     Map<String, String> params = {
       'username': _nameController.text,
       'password': _passwordController.text,
@@ -132,21 +166,22 @@ class _LoginState extends State<Login> {
 
     try {
       Map<String, dynamic> result = await ApiAccount.fetchLogin(params);
-
+      showHUD(false);
       if (result['code'] as int == 200) {
         String accessToken = result['data']['accessToken'] as String;
         UserManager().accessToken = accessToken;
-        print(UserManager());
+        print('accessToken $accessToken');
         NetBaseEntity<User> profile = await ApiUser.fetchUserProfile();
         if (profile.code == 200) {
-          
+          UserManager().user = profile.data;
+          print(UserManager());
         }
-
       } else {
         showToast(result['message'] as String);
       }
     } catch (e) {
       showToast(e.toString());
+      showHUD(false);
     }
 
     // GlobalSettings globalSettings = Provider.of<GlobalSettings>(context);

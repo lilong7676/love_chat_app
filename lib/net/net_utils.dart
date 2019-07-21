@@ -5,6 +5,7 @@ import 'package:love_chat/providers/userManager.dart';
 import 'error_handle.dart';
 import 'net_base_entity.dart';
 import 'package:love_chat/entity_factory.dart';
+import 'package:love_chat/providers/userManager.dart';
 
 enum Method {
   get,
@@ -23,49 +24,27 @@ void log(String msg) {
   print(msg);
 }
 
+BaseOptions baseOptions = BaseOptions(
+  baseUrl: baseUrl,
+  connectTimeout: 50000,
+  receiveTimeout: 30000,
+  responseType: ResponseType.json,
+  validateStatus: (status) {
+    // 不使用http状态码判断状态，使用AdapterInterceptor来处理（适用于标准REST风格）
+    return true;
+  },
+);
+Dio dio = Dio(baseOptions);
+
 class NetUtils {
-  static final NetUtils _instance = NetUtils._internal();
-
-  static NetUtils get instance => NetUtils();
-
-  factory NetUtils() {
-    return _instance;
-  }
-
-  static Dio _dio;
-
-  Dio getDio() {
-    return _dio;
-  }
-
-  NetUtils._internal() {
-    var options = BaseOptions(
-      connectTimeout: 15000,
-      receiveTimeout: 15000,
-      responseType: ResponseType.json,
-      validateStatus: (status) {
-        // 不使用http状态码判断状态，使用AdapterInterceptor来处理（适用于标准REST风格）
-        return true;
-      },
-      baseUrl: baseUrl,
-//      contentType: ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8'),
-    );
-    _dio = Dio(options);
-
-    /// 统一添加身份验证请求头
-    _dio.interceptors.add(AuthInterceptor());
-
-    /// 打印Log
-    // _dio.interceptors.add(LoggingInterceptor());
-  }
 
   // 数据返回格式统一，统一处理异常
-  Future<NetBaseEntity<T>> _request<T>(String method, String url,
+  static Future<NetBaseEntity<T>> _request<T>(String method, String url,
       {Map<String, dynamic> data,
       Map<String, dynamic> queryParameters,
       CancelToken cancelToken,
       Options options}) async {
-    var response = await _dio.request(url,
+    var response = await dio.request(url,
         data: data,
         queryParameters: queryParameters,
         options: _checkOptions(method, options),
@@ -80,21 +59,22 @@ class NetUtils {
       _code = _map['code'];
       _msg = _map['message'];
       if (_map.containsKey('data')) {
-        _data = EntityFactory.generateOBJ(_map['data']);
+        _data = EntityFactory.generateOBJ<T>(_map['data']);
       }
     } catch (e) {
       print(e);
       return NetBaseEntity(ExceptionHandle.parse_error, '数据解析错误', _data);
     }
-    return NetBaseEntity(_code, _msg, _data);
+    var result = NetBaseEntity<T>(_code, _msg, _data);
+    return result;
   }
 
-  Future<NetBaseEntity<List<T>>> _requestList<T>(String method, String url,
+  static Future<NetBaseEntity<List<T>>> _requestList<T>(String method, String url,
       {Map<String, dynamic> data,
       Map<String, dynamic> queryParameters,
       CancelToken cancelToken,
       Options options}) async {
-    var response = await _dio.request(url,
+    var response = await dio.request(url,
         data: data,
         queryParameters: queryParameters,
         options: _checkOptions(method, options),
@@ -117,19 +97,19 @@ class NetUtils {
       print(e);
       return NetBaseEntity(ExceptionHandle.parse_error, '数据解析错误', _data);
     }
-    return NetBaseEntity(_code, _msg, _data);
+    return NetBaseEntity<List<T>>(_code, _msg, _data);
   }
 
-  Options _checkOptions(method, options) {
+  static Options _checkOptions(method, options) {
     if (options == null) {
-      options = new Options();
+      options = Options(headers: {'Authorization': 'Bearer ${UserManager().accessToken}'});
     }
     options.method = method;
     return options;
   }
 
 // public
-  Future<NetBaseEntity<T>> request<T>(Method method, String url,
+  static Future<NetBaseEntity<T>> request<T>(Method method, String url,
       {Map<String, dynamic> params,
       Map<String, dynamic> queryParameters,
       CancelToken cancelToken,
@@ -150,7 +130,7 @@ class NetUtils {
     }
   }
 
-  Future<NetBaseEntity<List<T>>> requestList<T>(Method method, String url,
+  static Future<NetBaseEntity<List<T>>> requestList<T>(Method method, String url,
       {Map<String, dynamic> params,
       Map<String, dynamic> queryParameters,
       CancelToken cancelToken,
@@ -172,7 +152,7 @@ class NetUtils {
   }
 
   /// 统一处理(onSuccess返回T对象，onSuccessList返回List<T>)
-  Future requestNetwork<T>(Method method, String url,
+  static Future<NetBaseEntity<T>> requestNetwork<T>(Method method, String url,
       {Map<String, dynamic> params,
       Map<String, dynamic> queryParameters,
       CancelToken cancelToken,
@@ -180,7 +160,7 @@ class NetUtils {
       bool isList: false}) {
     String m = _getRequestMethod(method);
 
-    Future<NetBaseEntity> requestFuture = isList
+    Future<NetBaseEntity<T>> requestFuture = isList
         ? _requestList<T>(m, url,
             data: params,
             queryParameters: queryParameters,
@@ -204,11 +184,11 @@ class NetUtils {
     });
   }
 
-  _onError(int code, String msg) {
+  static _onError(int code, String msg) {
     log('接口请求异常： code: $code, msg: $msg');
   }
 
-  String _getRequestMethod(Method method) {
+  static String _getRequestMethod(Method method) {
     String m;
     switch (method) {
       case Method.get:

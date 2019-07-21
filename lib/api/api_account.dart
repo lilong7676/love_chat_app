@@ -26,6 +26,6 @@ class ApiAccount {
 
   static Future fetchRegister(Map<String, String> payload) async {
     String url = '/users/register';
-    return NetUtils().requestNetwork(Method.post, url, params: payload);
+    return NetUtils.requestNetwork(Method.post, url, params: payload);
   }
 }
