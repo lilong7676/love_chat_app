@@ -9,7 +9,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   PageController _pageController;
-  int _page = 2;
+  int _page = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -30,18 +30,7 @@ class _HomeState extends State<Home> {
               icon: Icon(Icons.message),
               title: Text('Message'),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.group),
-              title: Text('Group'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              title: Text('Home'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
-              title: Text('通知'),
-            ),
+          
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
               title: Text('我'),

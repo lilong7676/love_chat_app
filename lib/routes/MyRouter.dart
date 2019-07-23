@@ -13,14 +13,14 @@ class MyRouter {
 
   static Route<dynamic> getRoute(RouteSettings settings) {
     // Object arguments = settings.arguments;
-    if (settings.name == '/login2') {
-      return MaterialPageRoute(
-        settings: settings,
-        builder: (BuildContext context) => Login(
-          title: 'What??',
-        ),
-      );
-    }
+    // if (settings.name == '/login2') {
+    //   return MaterialPageRoute(
+    //     settings: settings,
+    //     builder: (BuildContext context) => Login(
+    //       title: 'What??',
+    //     ),
+    //   );
+    // }
     return MaterialPageRoute(
         settings: settings, builder: routes[settings.name]);
   }

@@ -32,6 +32,7 @@ class _LoginState extends State<Login> {
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
   TapGestureRecognizer _registerTapGesture;
+
   @override
   void initState() {
     _userNameField = TextFormField(
@@ -175,6 +176,9 @@ class _LoginState extends State<Login> {
         if (profile.code == 200) {
           UserManager().user = profile.data;
           print(UserManager());
+
+          Navigator.pushReplacementNamed(context, '/home');
+
         }
       } else {
         showToast(result['message'] as String);
@@ -186,15 +190,6 @@ class _LoginState extends State<Login> {
 
     // GlobalSettings globalSettings = Provider.of<GlobalSettings>(context);
     // globalSettings.brightnessTheme = globalSettings.brightnessTheme == ThemeData.dark() ? ThemeData.light() : ThemeData.dark();
-
-    // if (ModalRoute.of(context).settings.name == '/login2') {
-    //   Navigator.pop(context, 'testPopResult');
-    // } else {
-    //   Navigator.pushNamed(context, '/login2', arguments: {'a': 1, 'b': 2})
-    //       .then((result) {
-    //     print('push Result $result');
-    //   });
-    // }
   }
 
   void unfocus() {
