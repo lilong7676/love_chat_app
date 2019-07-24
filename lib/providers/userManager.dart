@@ -1,4 +1,8 @@
 import 'package:love_chat/lv/user/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
+const String UserManagerSaveKey = 'UserManagerSaveKey';
 
 class UserManager {
   User _user;
@@ -9,6 +13,24 @@ class UserManager {
 
   set user(User user) {
     _user = user;
+  }
+
+  // 数据持久化
+  Future<bool> saveToDisk() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String instanceString = jsonEncode(_instance);
+    print('instanceString $instanceString');
+    return await prefs.setString(UserManagerSaveKey, instanceString);
+  }
+  // 数据恢复
+  Future<UserManager> restoreFromDisk() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jsonString = prefs.getString(UserManagerSaveKey);
+    if (jsonString.isNotEmpty) {
+      Map<String, dynamic> json = jsonDecode(jsonString);
+      return UserManager.fromJson(json);
+    }
+    return null;
   }
 
   // 单例相关
@@ -31,4 +53,21 @@ class UserManager {
   String toString() {
     return '{userId:$userId, userName:$userName, avatar:$avatar, accessToken:$accessToken}';
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'User': _user == null ? '' : _user.toJson(),
+      'accessToken': accessToken
+    };
+  }
+  
+  UserManager.fromJson(Map<String, dynamic> json) {
+    if ((json['User'] as String).isNotEmpty) {
+      _user = User.fromJson(json['User']);
+    }
+    if ((json['accessToken'] as String).isNotEmpty) {
+      accessToken = json['accessToken'];
+    }
+  }
+  
 }

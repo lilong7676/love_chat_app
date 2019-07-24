@@ -177,6 +177,12 @@ class _LoginState extends State<Login> {
           UserManager().user = profile.data;
           print(UserManager());
 
+          bool saveSuccess = await UserManager().saveToDisk();
+
+          print('saveSuccess $saveSuccess');
+
+          
+
           Navigator.pushReplacementNamed(context, '/home');
 
         }

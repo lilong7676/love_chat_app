@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
             theme: globalSettings.brightnessTheme,
             initialRoute: '/',
             routes: MyRouter.routes,
-            onGenerateRoute: MyRouter.getRoute,
+            onGenerateRoute: MyRouter.onGenerateRoute,
           );
         },
       ),

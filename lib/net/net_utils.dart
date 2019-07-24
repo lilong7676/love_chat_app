@@ -17,7 +17,7 @@ enum Method {
 
 final String accessToken = UserManager().accessToken;
 
-final String baseUrl = 'http://localhost:3000';
+final String baseUrl = 'http://10.0.2.2:3000';
 
 // 打日志
 void log(String msg) {
