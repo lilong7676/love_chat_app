@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:love_chat/screens/login/login_page.dart';
 import 'package:love_chat/screens/login/register_page.dart';
 import 'package:love_chat/screens/home/home_page.dart';
+import 'package:love_chat/screens/welcome_page.dart';
 
 class MyRouter {
   static final routes = <String, WidgetBuilder>{
+    '/': (BuildContext context) => WelcomePage(),
+    '/login': (BuildContext context) => Login(),
     '/register': (BuildContext context) => RegisterPage(),
     '/home': (BuildContext context) => Home(),
   };
@@ -20,12 +23,7 @@ class MyRouter {
     //     ),
     //   );
     // }
-    if (settings.name == '/') {
-      print('00000000000000000000');
-      return MaterialPageRoute(
-        settings: settings, builder: (BuildContext context) => Login()
-      );
-    }
+   
     return MaterialPageRoute(
         settings: settings, builder: routes[settings.name]);
   }

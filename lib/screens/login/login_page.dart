@@ -23,7 +23,7 @@ class _LoginState extends State<Login> {
   TextFormField _passwordField;
 
   bool _isSaving = false;
-  void showHUD (bool isSaving) {
+  void showHUD(bool isSaving) {
     setState(() {
       _isSaving = isSaving;
     });
@@ -181,10 +181,7 @@ class _LoginState extends State<Login> {
 
           print('saveSuccess $saveSuccess');
 
-          
-
-          Navigator.pushReplacementNamed(context, '/home');
-
+          goHomePage();
         }
       } else {
         showToast(result['message'] as String);
@@ -196,6 +193,12 @@ class _LoginState extends State<Login> {
 
     // GlobalSettings globalSettings = Provider.of<GlobalSettings>(context);
     // globalSettings.brightnessTheme = globalSettings.brightnessTheme == ThemeData.dark() ? ThemeData.light() : ThemeData.dark();
+  }
+
+
+
+  void goHomePage() {
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   void unfocus() {

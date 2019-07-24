@@ -15,6 +15,11 @@ class UserManager {
     _user = user;
   }
 
+  // 当前用户是否已登录
+  bool hasLogin() {
+    return accessToken.isNotEmpty && _user != null;
+  }
+
   // 数据持久化
   Future<bool> saveToDisk() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -26,7 +31,7 @@ class UserManager {
   Future<UserManager> restoreFromDisk() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String jsonString = prefs.getString(UserManagerSaveKey);
-    if (jsonString.isNotEmpty) {
+    if (jsonString != null && jsonString.isNotEmpty) {
       Map<String, dynamic> json = jsonDecode(jsonString);
       return UserManager.fromJson(json);
     }
@@ -62,7 +67,7 @@ class UserManager {
   }
   
   UserManager.fromJson(Map<String, dynamic> json) {
-    if ((json['User'] as String).isNotEmpty) {
+    if (json['User'] != null) {
       _user = User.fromJson(json['User']);
     }
     if ((json['accessToken'] as String).isNotEmpty) {
