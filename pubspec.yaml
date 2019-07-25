@@ -26,6 +26,7 @@ dependencies:
   provider: ^3.0.0
   dio: ^2.1.0
   shared_preferences: ^0.5.3
+  socket_io_client: ^0.9.1
 
 dev_dependencies:
   flutter_test:

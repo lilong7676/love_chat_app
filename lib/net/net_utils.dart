@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:love_chat/providers/userManager.dart';
 import 'error_handle.dart';
 import 'net_base_entity.dart';
 import 'package:love_chat/entity_factory.dart';
-import 'package:love_chat/providers/userManager.dart';
 
 enum Method {
   get,
@@ -17,7 +14,7 @@ enum Method {
 
 final String accessToken = UserManager().accessToken;
 
-final String baseUrl = 'http://10.0.2.2:3000';
+final String baseUrl = 'http://localhost:3000';
 
 // 打日志
 void log(String msg) {
