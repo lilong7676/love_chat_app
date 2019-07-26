@@ -17,7 +17,7 @@ class UserManager {
 
   // 当前用户是否已登录
   bool hasLogin() {
-    return accessToken.isNotEmpty && _user != null;
+    return accessToken != null && _user != null;
   }
 
   // 数据持久化
@@ -33,14 +33,17 @@ class UserManager {
     String jsonString = prefs.getString(UserManagerSaveKey);
     if (jsonString != null && jsonString.isNotEmpty) {
       Map<String, dynamic> json = jsonDecode(jsonString);
-      return UserManager.fromJson(json);
+      UserManager.fromJson(json);
+      return UserManager();
     }
     return null;
   }
 
   // 单例相关
   // 单例公开访问点
-  factory UserManager() => _sharedInstance();
+  factory UserManager() {
+    return _sharedInstance();
+  }
   // 供内部使用
   static UserManager _instance;
   // 命名构造函数
@@ -67,11 +70,12 @@ class UserManager {
   }
   
   UserManager.fromJson(Map<String, dynamic> json) {
+    UserManager manager = UserManager();
     if (json['User'] != null) {
-      _user = User.fromJson(json['User']);
+      manager._user = User.fromJson(json['User']);
     }
     if ((json['accessToken'] as String).isNotEmpty) {
-      accessToken = json['accessToken'];
+      manager.accessToken = json['accessToken'];
     }
   }
   
