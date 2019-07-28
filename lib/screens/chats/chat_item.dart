@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:love_chat/lv/user/user.dart';
 
 class ChatItem extends StatelessWidget {
-  const ChatItem({Key key}) : super(key: key);
+  User _user;
+
+  ChatItem({Key key, User user}) : super(key: key) {
+    _user = user;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,8 +15,8 @@ class ChatItem extends StatelessWidget {
       leading: CircleAvatar(
         backgroundColor: Colors.blueAccent,
       ),
-      title: Text('title'),
-      subtitle: Text('subTitle'),
+      title: Text(_user.username),
+      subtitle: Text(_user?.userId.toString()),
       enabled: true,
       onTap: (){},
     );

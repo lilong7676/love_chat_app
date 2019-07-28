@@ -8,7 +8,7 @@ class UserManager {
   User _user;
   String accessToken;
   int get userId => _user?.userId;
-  String get userName => _user?.userName;
+  String get username => _user?.username;
   String get avatar => _user?.avatar;
 
   set user(User user) {
@@ -59,7 +59,7 @@ class UserManager {
 
   @override
   String toString() {
-    return '{userId:$userId, userName:$userName, avatar:$avatar, accessToken:$accessToken}';
+    return '{userId:$userId, userName:$username, avatar:$avatar, accessToken:$accessToken}';
   }
 
   Map<String, dynamic> toJson() {
